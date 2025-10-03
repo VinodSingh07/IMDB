@@ -1,4 +1,14 @@
 const API_KEY = "65d34a7c";
+const url = `https://api.allorigins.win/get?url=${encodeURIComponent(
+  `https://www.omdbapi.com/?apikey=${API_KEY}&s=batman`
+)}`;
+
+fetch(url)
+  .then((res) => res.json())
+  .then((data) => {
+    const json = JSON.parse(data.contents);
+    console.log(json);
+  });
 
 // ----------------- Home Page Logic -----------------
 const searchInput = document.getElementById("searchInput");
@@ -21,6 +31,7 @@ if (searchInput) {
       resultsDiv.innerHTML = "<p class='text-gray-600'>No results found.</p>";
     }
   });
+  ("");
 }
 
 function displaySearchResults(movies) {
