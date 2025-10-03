@@ -1,4 +1,6 @@
-// ----------------- Home Page -----------------
+const API_KEY = "65d34a7c";
+
+// ----------------- Home Page Logic -----------------
 const searchInput = document.getElementById("searchInput");
 const resultsDiv = document.getElementById("results");
 
@@ -9,15 +11,17 @@ if (searchInput) {
       resultsDiv.innerHTML = "";
       return;
     }
-
-    // Call Vercel backend proxy
-    const res = await fetch(`/api/movies?search=${query}`);
+    const res = await fetch(
+      `http://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`
+    );
     const data = await res.json();
-
-    if (data.Search) displaySearchResults(data.Search);
-    else
+    if (data.Search) {
+      displaySearchResults(data.Search);
+    } else {
       resultsDiv.innerHTML = "<p class='text-gray-600'>No results found.</p>";
+    }
   });
+  ("");
 }
 
 function displaySearchResults(movies) {
@@ -29,17 +33,16 @@ function displaySearchResults(movies) {
         movie.Poster !== "N/A"
           ? movie.Poster
           : "https://via.placeholder.com/150"
-      }" 
-        class="w-full h-64 object-cover rounded"/>
+      }" class="w-full h-64 object-cover rounded"/>
       <h2 class="font-bold mt-2">${movie.Title}</h2>
       <p>${movie.Year}</p>
       <div class="flex justify-between mt-2">
         <button onclick="addToFavourites('${movie.imdbID}','${movie.Title}','${
         movie.Poster
       }','${movie.Year}')"
-          class="px-2 py-1 bg-yellow-500 text-white rounded cursor-pointer hover:bg-yellow-600">⭐ Favourite</button>
+          class="px-2 py-1 bg-yellow-500 text-white rounded">⭐ Favourite</button>
         <a href="movie.html?id=${movie.imdbID}" 
-          class="px-2 py-1 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600">ℹ️ Details</a>
+          class="px-2 py-1 bg-blue-500 text-white rounded">ℹ️ Details</a>
       </div>
     </div>
   `
@@ -47,13 +50,14 @@ function displaySearchResults(movies) {
     .join("");
 }
 
-// ----------------- Movie Page -----------------
+// ----------------- Movie Page Logic -----------------
 const movieDetailsDiv = document.getElementById("movieDetails");
+
 if (movieDetailsDiv) {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
   if (id) {
-    fetch(`/api/movies?id=${id}`)
+    fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&i=${id}&plot=full`)
       .then((res) => res.json())
       .then((movie) => {
         movieDetailsDiv.innerHTML = `
@@ -73,14 +77,17 @@ if (movieDetailsDiv) {
 // ----------------- Favourites Logic -----------------
 function addToFavourites(id, title, poster, year) {
   let favs = JSON.parse(localStorage.getItem("favourites")) || [];
-  if (!favs.some((m) => m.id === id)) {
+  if (!favs.some((movie) => movie.id === id)) {
     favs.push({ id, title, poster, year });
     localStorage.setItem("favourites", JSON.stringify(favs));
     alert("Added to favourites!");
-  } else alert("Already in favourites!");
+  } else {
+    alert("Already in favourites!");
+  }
 }
 
 const favouritesListDiv = document.getElementById("favouritesList");
+
 if (favouritesListDiv) {
   let favs = JSON.parse(localStorage.getItem("favourites")) || [];
   if (favs.length === 0) {
@@ -95,12 +102,11 @@ if (favouritesListDiv) {
           movie.poster !== "N/A"
             ? movie.poster
             : "https://via.placeholder.com/150"
-        }" 
-          class="w-full h-64 object-cover rounded"/>
+        }" class="w-full h-64 object-cover rounded"/>
         <h2 class="font-bold mt-2">${movie.title}</h2>
         <p>${movie.year}</p>
         <button onclick="removeFromFavourites('${movie.id}')"
-          class="mt-2 px-2 py-1 bg-red-500 text-white rounded cursor-pointer hover:bg-red-600">❌ Remove</button>
+          class="mt-2 px-2 py-1 bg-red-500 text-white rounded">❌ Remove</button>
       </div>
     `
       )
