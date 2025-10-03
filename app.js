@@ -1,4 +1,4 @@
-const API_KEY = "65d34a7c";
+const API_KEY = "65d34a7c"; // Use your OMDb API key
 
 // ----------------- Home Page Logic -----------------
 const searchInput = document.getElementById("searchInput");
@@ -11,8 +11,11 @@ if (searchInput) {
       resultsDiv.innerHTML = "";
       return;
     }
+    // Always use HTTPS
     const res = await fetch(
-      `http://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`
+      `https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(
+        query
+      )}`
     );
     const data = await res.json();
     if (data.Search) {
@@ -21,7 +24,6 @@ if (searchInput) {
       resultsDiv.innerHTML = "<p class='text-gray-600'>No results found.</p>";
     }
   });
-  ("");
 }
 
 function displaySearchResults(movies) {
@@ -37,9 +39,11 @@ function displaySearchResults(movies) {
       <h2 class="font-bold mt-2">${movie.Title}</h2>
       <p>${movie.Year}</p>
       <div class="flex justify-between mt-2">
-        <button onclick="addToFavourites('${movie.imdbID}','${movie.Title}','${
-        movie.Poster
-      }','${movie.Year}')"
+        <button onclick="addToFavourites('${
+          movie.imdbID
+        }','${movie.Title.replace(/'/g, "\\'")}','${movie.Poster}','${
+        movie.Year
+      }')"
           class="px-2 py-1 bg-yellow-500 text-white rounded">⭐ Favourite</button>
         <a href="movie.html?id=${movie.imdbID}" 
           class="px-2 py-1 bg-blue-500 text-white rounded">ℹ️ Details</a>
@@ -62,8 +66,14 @@ if (movieDetailsDiv) {
       .then((movie) => {
         movieDetailsDiv.innerHTML = `
           <div class="bg-white p-6 rounded-lg shadow-lg max-w-3xl mx-auto">
-            <img src="${movie.Poster}" class="w-48 mb-4"/>
-            <h1 class="text-3xl font-bold mb-2">${movie.Title} (${movie.Year})</h1>
+            <img src="${
+              movie.Poster !== "N/A"
+                ? movie.Poster
+                : "https://via.placeholder.com/150"
+            }" class="w-48 mb-4"/>
+            <h1 class="text-3xl font-bold mb-2">${movie.Title} (${
+          movie.Year
+        })</h1>
             <p class="mb-2"><strong>Genre:</strong> ${movie.Genre}</p>
             <p class="mb-2"><strong>Director:</strong> ${movie.Director}</p>
             <p class="mb-2"><strong>Actors:</strong> ${movie.Actors}</p>
